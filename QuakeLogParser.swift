@@ -10,17 +10,24 @@ class Game {
     var kills: [String:Int] = [String:Int]()
 
     func addPlayer(player: String) {
-        if players.contains(player) == false {
-            players.append(player)
+        if self.players.contains(player) == false {
+            self.players.append(player)
         }
 
-        if kills.keys.contains(player) == false {
-            kills[player] = 0
+        if self.kills.keys.contains(player) == false {
+            self.kills[player] = 0
         }
     }
 
     func advanceKill(player: String, by: Int) {
-        kills[player]?.advanced(by: by)
+        self.addPlayer(player: player)
+        if let currentKills = self.kills[player] {
+            self.kills[player] = currentKills + by
+        } else {
+            self.kills[player] = by
+        }
+
+
     }
 
     func toDictionary() -> [String:Any] {
@@ -38,6 +45,7 @@ class Game {
 
 class QuakeLogParser {
     var games = [[String:Any]]();
+    let parseKillRegex = "Kill:\\s+\\d+\\s+\\d+\\s+\\d+:\\s+([\\d\\w<>]+)\\s+killed\\s+([\\d\\w<>]+)\\s+by\\s+(MOD_\\w+)"
 
     func requestLog(url: String, onSuccess:@escaping (Data) -> Void, onFailure:@escaping (String) -> Void) {
         let requestURL:URL = URL(string: url)!
@@ -133,7 +141,7 @@ class QuakeLogParser {
     }
 
     func parseKill(entry: String, game: Game) -> Game {
-        let matches: [String] = regexMatches(pattern: "Kill:\\s+\\d+\\s+\\d+\\s+\\d+:\\s+([\\d\\w<>]+)\\s+killed\\s+([\\d\\w<>]+)\\s+by\\s+(MOD_\\w+)", inString: entry)
+        let matches: [String] = regexMatches(pattern: self.parseKillRegex, inString: entry)
 
         guard matches.count == 3 else {
             return game;
@@ -146,10 +154,28 @@ class QuakeLogParser {
         if matches[0] == "<world>" {
             game.advanceKill(player: matches[1], by: -1)
         } else {
-            game.addPlayer(player: matches[0])
             game.advanceKill(player: matches[0], by: 1)
         }
 
         return game
+    }
+
+    func killsByReason(entries: [String]) -> [String:Int] {
+        var out = [String:Int]()
+        for entry in entries {
+            let matches = regexMatches(pattern: self.parseKillRegex, inString: entry)
+            guard matches.count == 3 else {
+                continue
+            }
+
+            if out.keys.contains(matches[2]) == false {
+                out[matches[2]] = 0
+            }
+
+            let currentKills = out[matches[2]];
+            out[matches[2]] = currentKills! + 1;
+        }
+
+        return out
     }
 }

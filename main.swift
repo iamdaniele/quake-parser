@@ -26,6 +26,8 @@ class MainProcess {
             let json = try! JSONSerialization.data(withJSONObject: parser.games, options: .prettyPrinted);
             let out = String(data: json, encoding: String.Encoding.utf8)
             print(out)
+
+            print("Kills by means: \(parser.killsByReason(entries: entries))")
             semaphore.signal()
         }
     }
