@@ -10,4 +10,6 @@ sudo xcode-select -switch /Path/To/Your/Xcode\ 8/Contents/Developer
 ./run.sh
 
 Unit tests:
-xcrun swift test.swift
+cd tests && ./test.sh
+
+Playground versions are available for both executable and test coverage.
