@@ -7,7 +7,7 @@ Swift 3 is required. Make sure you have Xcode 8 installed on your machine
 
 For macOS:
 sudo xcode-select -switch /Path/To/Your/Xcode\ 8/Contents/Developer
-xcrun swift main.swift
+./run.sh
 
 Unit tests:
 xcrun swift test.swift

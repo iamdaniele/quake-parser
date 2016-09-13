@@ -83,6 +83,7 @@ func requestLog(url: String, onSuccess:@escaping (Data) -> Void, onFailure:@esca
 func handleSuccess(data: Data) {
     if let stringData = String(data: data, encoding: String.Encoding.utf8) {
         let entries:[String] = stringData.components(separatedBy: "\n")
+        entries.cou
         parseLog(entries: entries)
         let json = try! JSONSerialization.data(withJSONObject: games, options: .prettyPrinted);
         let out = String(data: json, encoding: String.Encoding.utf8)
@@ -169,5 +170,3 @@ func parseKill(entry: String, game: Game) -> Game {
 }
 
 main()
-
-DispatchSemaphore.
